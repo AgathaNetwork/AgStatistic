@@ -1,0 +1,4 @@
+name: AgStatistic
+version: '1.0'
+main: cn.org.agatha.agStatistic.AgStatistic
+api-version: '1.21'
