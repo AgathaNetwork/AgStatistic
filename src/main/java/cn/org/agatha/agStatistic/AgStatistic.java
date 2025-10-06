@@ -4,6 +4,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class AgStatistic extends JavaPlugin {
     private DatabaseManager databaseManager;
+    private PlayerSession playerSession;
 
     @Override
     public void onEnable() {
@@ -25,6 +26,12 @@ public final class AgStatistic extends JavaPlugin {
         // 启动连接检测任务
         databaseManager.startConnectionCheck();
         
+        // 初始化玩家会话管理器
+        playerSession = new PlayerSession(this, databaseManager);
+        
+        // 注册玩家监听器
+        getServer().getPluginManager().registerEvents(new PlayerListener(this, playerSession), this);
+        
         getLogger().info("AgStatistic 插件已启用!");
     }
 
@@ -41,5 +48,9 @@ public final class AgStatistic extends JavaPlugin {
     
     public DatabaseManager getDatabaseManager() {
         return databaseManager;
+    }
+    
+    public PlayerSession getPlayerSession() {
+        return playerSession;
     }
 }
