@@ -48,29 +48,27 @@ public class StatGUI {
             gui.setItem(i, createItem(Material.BLACK_STAINED_GLASS_PANE, " ", null));
         }
         
-        // 设置日历标题行
-        String[] weekdays = {"日", "一", "二", "三", "四", "五", "六"};
-        for (int i = 0; i < 7; i++) {
-            gui.setItem(i + 1, createItem(Material.WHITE_STAINED_GLASS_PANE, weekdays[i], null));
-        }
-        
         // 计算该月第一天是星期几 (0=星期日, 1=星期一, ..., 6=星期六)
-        int firstDayOfWeek = firstDayOfMonth.getDayOfWeek().getValue() % 7;
+        // getValue() 返回 1=Monday, ..., 7=Sunday，需要转换为 0=Sunday, ..., 6=Saturday
+        int firstDayOfWeek = (firstDayOfMonth.getDayOfWeek().getValue() % 7);
         
-        // 填充日期
+        // 填充日期 (从第二行开始，位置 9-53)
+        // 使用新的算法：找到一个月中的所有周六，然后在每个周六后面空一格
+        int position = 1 + firstDayOfWeek; // 第一天的位置
         for (int day = 1; day <= daysInMonth; day++) {
-            LocalDate date = currentYearMonth.atDay(day);
-            int dayOfWeek = date.getDayOfWeek().getValue() % 7;
-            
-            // 计算在GUI中的位置
-            // 第一行是标题(0-8)，从第二行开始放置日期(9-53)
-            int position = 10 + (dayOfWeek - firstDayOfWeek) + ((day + firstDayOfWeek - 1) / 7) * 9;
-            
             if (position >= 9 && position < GUI_SIZE) {
                 String playtime = getPlayerPlaytimeForDay(plugin, playerName, day);
                 gui.setItem(position, createItem(Material.LIME_STAINED_GLASS_PANE, 
                     String.format("%02d", day) + "日", 
                     playtime != null ? List.of("在线时间: " + playtime) : List.of("无记录")));
+            }
+            
+            // 如果明天是周日（即今天是周六），则跳过一个位置
+            LocalDate currentDate = currentYearMonth.atDay(day);
+            if (currentDate.getDayOfWeek().getValue() == 6) { // 6表示Saturday
+                position += 3; // 跳过一个空位
+            } else {
+                position += 1;
             }
         }
     }
