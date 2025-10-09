@@ -50,9 +50,31 @@ public class DatabaseManager {
                     "jdbc:mysql://" + host + ":" + port + "/" + database, props);
 
             Logger.getLogger("Minecraft").info("[AgStatistic] 数据库连接成功建立");
+            
+            // 检查并创建表
+            checkAndCreateTable();
         } catch (SQLException e) {
             Logger.getLogger("Minecraft").severe("[AgStatistic] 数据库连接失败: " + e.getMessage());
             throw e;
+        }
+    }
+
+    private void checkAndCreateTable() {
+        try {
+            Statement stmt = connection.createStatement();
+            String createTableSQL = "CREATE TABLE IF NOT EXISTS player_sessions (" +
+                    "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                    "username VARCHAR(255) NOT NULL, " +
+                    "timestamp BIGINT NOT NULL, " +
+                    "event_type ENUM('join', 'quit') NOT NULL, " +
+                    "INDEX idx_username (username), " +
+                    "INDEX idx_timestamp (timestamp)" +
+                    ")";
+            stmt.executeUpdate(createTableSQL);
+            stmt.close();
+            Logger.getLogger("Minecraft").info("[AgStatistic] 数据库表检查/创建完成");
+        } catch (SQLException e) {
+            Logger.getLogger("Minecraft").severe("[AgStatistic] 创建表时出错: " + e.getMessage());
         }
     }
 

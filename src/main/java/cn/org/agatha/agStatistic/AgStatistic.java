@@ -32,6 +32,9 @@ public final class AgStatistic extends JavaPlugin {
         // 注册玩家监听器
         getServer().getPluginManager().registerEvents(new PlayerListener(this, playerSession), this);
         
+        // 注册命令
+        this.getCommand("stat").setExecutor(new StatCommand(this));
+        
         getLogger().info("AgStatistic 插件已启用!");
     }
 

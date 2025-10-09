@@ -2,3 +2,7 @@ name: AgStatistic
 version: '1.0'
 main: cn.org.agatha.agStatistic.AgStatistic
 api-version: '1.21'
+commands:
+  stat:
+    description: 显示玩家在线统计数据
+    usage: /stat
