@@ -54,13 +54,19 @@ public class PlayerListener implements Listener {
             if (event.getSlot() == 0 && clickedItem.getType() == Material.OAK_SIGN) {
                 // 点击了"上一个月"按钮
                 YearMonth previousMonth = currentYearMonth.minusMonths(1);
-                player.closeInventory();
-                StatGUI.openGUI(player, plugin, previousMonth);
+                statGUIHolder.setYearMonth(previousMonth);
+                // 更新窗口标题
+                player.getOpenInventory().setTitle("玩家在线统计 - " + previousMonth.format(java.time.format.DateTimeFormatter.ofPattern("yyyy年MM月")));
+                // 更新GUI内容
+                StatGUI.updateGUI(inventory, plugin, player.getName(), previousMonth);
             } else if (event.getSlot() == 8 && clickedItem.getType() == Material.OAK_SIGN) {
                 // 点击了"下一个月"按钮
                 YearMonth nextMonth = currentYearMonth.plusMonths(1);
-                player.closeInventory();
-                StatGUI.openGUI(player, plugin, nextMonth);
+                statGUIHolder.setYearMonth(nextMonth);
+                // 更新窗口标题
+                player.getOpenInventory().setTitle("玩家在线统计 - " + nextMonth.format(java.time.format.DateTimeFormatter.ofPattern("yyyy年MM月")));
+                // 更新GUI内容
+                StatGUI.updateGUI(inventory, plugin, player.getName(), nextMonth);
             }
         }
     }

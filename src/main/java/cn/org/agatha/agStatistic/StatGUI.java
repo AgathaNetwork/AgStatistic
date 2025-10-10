@@ -44,6 +44,42 @@ public class StatGUI {
             }
         });
     }
+    
+    /**
+     * 更新现有的GUI内容
+     * @param gui 要更新的GUI
+     * @param plugin 插件实例
+     * @param playerName 玩家名
+     * @param yearMonth 要统计的年月
+     */
+    public static void updateGUI(Inventory gui, AgStatistic plugin, String playerName, YearMonth yearMonth) {
+        // 在主线程中先显示加载指示器
+        for (int i = 0; i < GUI_SIZE; i++) {
+            gui.setItem(i, createItem(Material.BLACK_STAINED_GLASS_PANE, " ", null));
+        }
+        // 在中间放置指南针表示正在加载
+        gui.setItem(22, createItem(Material.COMPASS, "§e正在加载...", null));
+        
+        // 异步加载数据
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+            try {
+                populateGUI(gui, plugin, playerName, yearMonth);
+                
+                // 切换到主线程更新GUI
+                plugin.getServer().getScheduler().runTask(plugin, () -> {
+                    // 更新GUI内容
+                    gui.getViewers().forEach(viewer -> {
+                        if (viewer instanceof Player) {
+                            ((Player) viewer).updateInventory();
+                        }
+                    });
+                });
+            } catch (Exception e) {
+                plugin.getLogger().severe("更新统计GUI时出错: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+    }
 
     private static void populateGUI(Inventory gui, AgStatistic plugin, String playerName, YearMonth yearMonth) {
         int daysInMonth = yearMonth.lengthOfMonth();
